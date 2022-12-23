@@ -1,5 +1,3 @@
-git.furqansoftware.net/toph/markdown v0.0.0-20221222164821-c136b586fb2b h1:MD+1CDzGFiFOBUm3jVJ7khM/hZu/XfaML3uBLKolm78=
-git.furqansoftware.net/toph/markdown v0.0.0-20221222164821-c136b586fb2b/go.mod h1:e7VGR09JsJzbgGZ06vm5zxPIvDk4ZQghZpvfCgZL5no=
 github.com/bluele/gcache v0.0.2 h1:WcbfdXICg7G/DGBh1PFfcirkWOQV+v077yF1pSy3DGw=
 github.com/bluele/gcache v0.0.2/go.mod h1:m15KV+ECjptwSPxKhOhQoAFQVtUFjTVkc3H8o0t/fp0=
 github.com/davecgh/go-spew v1.1.0 h1:ZDRjVQ15GmhC3fiQ8ni8+OwkZQO4DARzQgrnXU1Liz8=

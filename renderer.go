@@ -3,7 +3,6 @@ package katex
 import (
 	"bytes"
 
-	katexjs "git.furqansoftware.net/toph/markdown/katex"
 	"github.com/bluele/gcache"
 	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/renderer"
@@ -65,7 +64,7 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = katexjs.Render(&b, node.Equation, true)
+			err = Render(&b, node.Equation, true)
 			if err != nil {
 				return ast.WalkStop, err
 			}
