@@ -1,5 +1,7 @@
 # Goldmark Katex
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/FurqanSoftware/goldmark-katex.svg)](https://pkg.go.dev/github.com/FurqanSoftware/goldmark-katex)
+
 Goldmark Katex is a [Goldmark](https://github.com/yuin/goldmark) extension providing math and equation support through [KaTeX](https://katex.org/).
 
 ## Usage
