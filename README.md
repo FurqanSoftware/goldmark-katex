@@ -52,3 +52,7 @@ $$
 </td>
 </tr>
 </table>
+
+## More Goldmark Extensions
+
+- [D2](https://github.com/FurqanSoftware/goldmark-d2): diagram support through [D2](https://d2lang.com/)
