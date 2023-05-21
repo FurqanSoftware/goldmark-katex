@@ -33,7 +33,7 @@ func (s *Parser) Parse(parent ast.Node, block text.Reader, pc parser.Context) as
 		offset := 2
 
 	L:
-		for x := 0; x < 5; x++ {
+		for x := 0; x < 20; x++ {
 			for j := offset; j < len(line); j++ {
 				if len(line) > j+1 && line[j] == trigger && line[j+1] == trigger {
 					end = lstart + j
