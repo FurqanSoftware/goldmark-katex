@@ -2,6 +2,7 @@ package katex
 
 import (
 	_ "embed"
+	"fmt"
 	"io"
 	"runtime"
 
@@ -29,12 +30,14 @@ func Render(w io.Writer, src []byte, display bool) error {
 	}
 	defer result.Free()
 
+	throwOnError := false
+
 	globals.Set("_EqSrc3120", context.String(string(src)))
-	if display {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120, { displayMode: true })")
-	} else {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120)")
-	}
+	result, err = context.Eval(fmt.Sprintf(`katex.renderToString(_EqSrc3120, {
+		displayMode: %t,
+		throwOnError: %t
+	})`, display, throwOnError))
+
 	defer result.Free()
 
 	_, err = io.WriteString(w, result.String())
