@@ -35,7 +35,7 @@ func (r *HTMLRenderer) renderInline(w util.BufWriter, source []byte, n ast.Node,
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, false)
+			err = Render(&b, node.Equation, false, false)
 			if err != nil {
 				return ast.WalkStop, err
 			}
@@ -64,7 +64,7 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, true)
+			err = Render(&b, node.Equation, true, false)
 			if err != nil {
 				return ast.WalkStop, err
 			}

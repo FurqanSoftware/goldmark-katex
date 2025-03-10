@@ -8,7 +8,7 @@ import (
 
 func ExampleRender() {
 	b := bytes.Buffer{}
-	Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false)
+	Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false, false)
 	fmt.Println(b.String())
 
 	// Output:
@@ -18,6 +18,6 @@ func ExampleRender() {
 func BenchmarkRender(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		b := bytes.Buffer{}
-		Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false)
+		Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false, false)
 	}
 }
