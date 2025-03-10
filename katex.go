@@ -35,7 +35,9 @@ func Render(w io.Writer, src []byte, display bool, throwOnError bool) error {
 		displayMode: %t,
 		throwOnError: %t
 	})`, display, throwOnError))
-
+	if err != nil {
+		return err
+	}
 	defer result.Free()
 
 	_, err = io.WriteString(w, result.String())

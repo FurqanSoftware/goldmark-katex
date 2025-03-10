@@ -15,6 +15,7 @@ type HTMLRenderer struct {
 
 	cacheInline  gcache.Cache
 	cacheDisplay gcache.Cache
+	throwOnError bool
 }
 
 func (r *HTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
@@ -35,7 +36,7 @@ func (r *HTMLRenderer) renderInline(w util.BufWriter, source []byte, n ast.Node,
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, false, false)
+			err = Render(&b, node.Equation, false, r.throwOnError)
 			if err != nil {
 				return ast.WalkStop, err
 			}
@@ -64,7 +65,7 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 
 		if err == gcache.KeyNotFoundError {
 			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, true, false)
+			err = Render(&b, node.Equation, true, r.throwOnError)
 			if err != nil {
 				return ast.WalkStop, err
 			}
