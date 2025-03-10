@@ -21,3 +21,21 @@ func BenchmarkRender(b *testing.B) {
 		Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false, false)
 	}
 }
+
+func ErrorRender(t *testing.T) {
+	// with throwOnError = true
+	b := bytes.Buffer{}
+	err := Render(&b, []byte(`\invalidcommand`), false, true)
+	if err == nil {
+		t.Error("Expected error for invalid KaTeX with throwOnError=true, got nil")
+	}
+
+	// with throwOnError = false
+	err = Render(&b, []byte(`\invalidcommand`), false, false)
+	if err != nil {
+		t.Errorf("Expected no error for invalid KaTeX with throwOnError=false, got: %v", err)
+	}
+	if !bytes.Contains(b.Bytes(), []byte("color:#cc0000")) {
+		t.Error("Couldn't find a red error message when rendering invalid KaTeX with throwOnError=false.")
+	}
+}
