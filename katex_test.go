@@ -22,7 +22,7 @@ func BenchmarkRender(b *testing.B) {
 	}
 }
 
-func ErrorRender(t *testing.T) {
+func TestRenderError(t *testing.T) {
 	// with throwOnError = true
 	b := bytes.Buffer{}
 	err := Render(&b, []byte(`\invalidcommand`), false, true)
