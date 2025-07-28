@@ -8,7 +8,7 @@ import (
 
 func ExampleRender() {
 	b := bytes.Buffer{}
-	Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false)
+	Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false, false)
 	fmt.Println(b.String())
 
 	// Output:
@@ -18,6 +18,24 @@ func ExampleRender() {
 func BenchmarkRender(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		b := bytes.Buffer{}
-		Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false)
+		Render(&b, []byte(`Y = A \dot X^2 + B \dot X + C`), false, false)
+	}
+}
+
+func TestRenderError(t *testing.T) {
+	// with throwOnError = true
+	b := bytes.Buffer{}
+	err := Render(&b, []byte(`\invalidcommand`), false, true)
+	if err == nil {
+		t.Error("Expected error for invalid KaTeX with throwOnError=true, got nil")
+	}
+
+	// with throwOnError = false
+	err = Render(&b, []byte(`\invalidcommand`), false, false)
+	if err != nil {
+		t.Errorf("Expected no error for invalid KaTeX with throwOnError=false, got: %v", err)
+	}
+	if !bytes.Contains(b.Bytes(), []byte("color:#cc0000")) {
+		t.Error("Couldn't find a red error message when rendering invalid KaTeX with throwOnError=false.")
 	}
 }
