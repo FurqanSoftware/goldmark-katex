@@ -1,13 +1,8 @@
-before_script:
-  - mkdir -p $GOPATH/src/git.furqansoftware.net/trinkets
-  - ln -s $CI_PROJECT_DIR $GOPATH/src/git.furqansoftware.net/trinkets/goldmark-katex
-  - cd $GOPATH/src/git.furqansoftware.net/trinkets/goldmark-katex
-
 stages:
   - test
 
 test go-1.24:
-  image: golang:1.24.2
+  image: golang:1.24.4
   stage: test
   script:
     - go install github.com/jstemmer/go-junit-report/v2@v2.1.0
