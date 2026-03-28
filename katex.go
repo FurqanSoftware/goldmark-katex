@@ -2,41 +2,37 @@ package katex
 
 import (
 	_ "embed"
+	"fmt"
 	"io"
-	"runtime"
 
-	"github.com/lithdew/quickjs"
+	"modernc.org/quickjs"
 )
 
 //go:embed katex.min.js
 var code string
 
 func Render(w io.Writer, src []byte, display bool) error {
-	runtime.LockOSThread()
-	defer runtime.UnlockOSThread()
-
-	runtime := quickjs.NewRuntime()
-	defer runtime.Free()
-
-	context := runtime.NewContext()
-	defer context.Free()
-
-	globals := context.Globals()
-
-	result, err := context.Eval(code)
+	vm, err := quickjs.NewVM()
 	if err != nil {
 		return err
 	}
-	defer result.Free()
+	defer vm.Close()
 
-	globals.Set("_EqSrc3120", context.String(string(src)))
-	if display {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120, { displayMode: true })")
-	} else {
-		result, err = context.Eval("katex.renderToString(_EqSrc3120)")
+	_, err = vm.Eval(code, quickjs.EvalGlobal)
+	if err != nil {
+		return err
 	}
-	defer result.Free()
 
-	_, err = io.WriteString(w, result.String())
+	expr := fmt.Sprintf("katex.renderToString(%q)", string(src))
+	if display {
+		expr = fmt.Sprintf("katex.renderToString(%q, { displayMode: true })", string(src))
+	}
+
+	result, err := vm.Eval(expr, quickjs.EvalGlobal)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.WriteString(w, result.(string))
 	return err
 }
