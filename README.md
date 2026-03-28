@@ -7,7 +7,13 @@ Goldmark Katex is a [Goldmark](https://github.com/yuin/goldmark) extension provi
 ## Usage
 
 ``` go
-goldmark.New(goldmark.WithExtensions(&Extender{})).Convert(src, dst)
+// Default, errors are highlighted in red in the output
+goldmark.New(goldmark.WithExtensions(&katex.Extender{})).Convert(src, dst)
+
+// With ThrowOnError set to true
+goldmark.New(goldmark.WithExtensions(&katex.Extender{
+    ThrowOnError: true,
+})).Convert(src, dst)
 ```
 
 Wrap inline math with a pair of single `$`:
