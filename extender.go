@@ -9,6 +9,7 @@ import (
 )
 
 type Extender struct {
+	ThrowOnError bool
 }
 
 func (e *Extender) Extend(m goldmark.Markdown) {
@@ -19,6 +20,7 @@ func (e *Extender) Extend(m goldmark.Markdown) {
 		util.Prioritized(&HTMLRenderer{
 			cacheInline:  gcache.New(5000).ARC().Build(),
 			cacheDisplay: gcache.New(5000).ARC().Build(),
+			throwOnError: e.ThrowOnError,
 		}, 0),
 	))
 }

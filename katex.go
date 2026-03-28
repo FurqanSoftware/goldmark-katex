@@ -11,7 +11,7 @@ import (
 //go:embed katex.min.js
 var code string
 
-func Render(w io.Writer, src []byte, display bool) error {
+func Render(w io.Writer, src []byte, display bool, throwOnError bool) error {
 	vm, err := quickjs.NewVM()
 	if err != nil {
 		return err
@@ -23,10 +23,10 @@ func Render(w io.Writer, src []byte, display bool) error {
 		return err
 	}
 
-	expr := fmt.Sprintf("katex.renderToString(%q)", string(src))
-	if display {
-		expr = fmt.Sprintf("katex.renderToString(%q, { displayMode: true })", string(src))
-	}
+	expr := fmt.Sprintf(`katex.renderToString(%q, {
+		displayMode: %t,
+		throwOnError: %t
+	})`, string(src), display, throwOnError)
 
 	result, err := vm.Eval(expr, quickjs.EvalGlobal)
 	if err != nil {
