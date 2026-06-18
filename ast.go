@@ -5,6 +5,7 @@ import (
 	"github.com/yuin/goldmark/util"
 )
 
+// Inline is an inline-level math node produced from "$...$".
 type Inline struct {
 	ast.BaseInline
 
@@ -33,19 +34,23 @@ func (n *Inline) Kind() ast.NodeKind {
 	return KindInline
 }
 
+// Block is a block-level display-math node produced from "$$...$$".
+//
+// It is parsed at the block level (see BlockParser) so multi-line equations are
+// never reinterpreted as Markdown. Setext headings ("=" on the next line), hard
+// wraps and "\\" row separators would otherwise mangle a multi-line equation
+// before KaTeX ever sees it. The raw LaTeX is held in Lines().
 type Block struct {
-	ast.BaseInline
+	ast.BaseBlock
 
-	Equation []byte
+	// closed marks a single-line "$$...$$" whose body was fully read in
+	// BlockParser.Open, so BlockParser.Continue closes it immediately.
+	closed bool
 }
 
-func (n *Block) IsBlank(source []byte) bool {
-	for c := n.FirstChild(); c != nil; c = c.NextSibling() {
-		text := c.(*ast.Text).Segment
-		if !util.IsBlank(text.Value(source)) {
-			return false
-		}
-	}
+// IsRaw reports that the body is raw LaTeX, so goldmark does not run inline
+// Markdown parsing over it (which would turn "_" into emphasis, drop "\,", etc.).
+func (n *Block) IsRaw() bool {
 	return true
 }
 

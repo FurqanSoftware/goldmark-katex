@@ -14,7 +14,7 @@ type HTMLRenderer struct {
 	html.Config
 
 	cacheInline  gcache.Cache
-	cacheDisplay gcache.Cache
+	cacheBlock   gcache.Cache
 	throwOnError bool
 }
 
@@ -23,6 +23,7 @@ func (r *HTMLRenderer) RegisterFuncs(reg renderer.NodeRendererFuncRegisterer) {
 	reg.Register(KindBlock, r.renderBlock)
 }
 
+// renderInline renders inline math ("$...$").
 func (r *HTMLRenderer) renderInline(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
 	if entering {
 		node := n.(*Inline)
@@ -52,33 +53,42 @@ func (r *HTMLRenderer) renderInline(w util.BufWriter, source []byte, n ast.Node,
 	return ast.WalkContinue, nil
 }
 
+// renderBlock renders block-level display math ("$$...$$"). The raw LaTeX is
+// held in the node's Lines(), wrapped in a <div> after KaTeX rendering.
 func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, entering bool) (ast.WalkStatus, error) {
-	if entering {
-		node := n.(*Block)
-
-		html, err := r.cacheDisplay.Get(string(node.Equation))
-
-		if err == nil {
-			w.Write(html.([]byte))
-			return ast.WalkContinue, nil
-		}
-
-		if err == gcache.KeyNotFoundError {
-			b := bytes.Buffer{}
-			err = Render(&b, node.Equation, true, r.throwOnError)
-			if err != nil {
-				return ast.WalkStop, err
-			}
-			html := b.Bytes()
-			w.WriteString("<div>")
-			w.Write(html)
-			w.WriteString("</div>")
-			r.cacheDisplay.Set(string(node.Equation), html)
-			return ast.WalkContinue, nil
-		}
-
-		return ast.WalkStop, err
+	if !entering {
+		return ast.WalkContinue, nil
 	}
 
-	return ast.WalkContinue, nil
+	var eq bytes.Buffer
+	lines := n.Lines()
+	for i := 0; i < lines.Len(); i++ {
+		seg := lines.At(i)
+		eq.Write(seg.Value(source))
+	}
+	equation := eq.Bytes()
+
+	html, err := r.cacheBlock.Get(string(equation))
+	if err == nil {
+		w.WriteString("<div>")
+		w.Write(html.([]byte))
+		w.WriteString("</div>")
+		return ast.WalkContinue, nil
+	}
+
+	if err == gcache.KeyNotFoundError {
+		b := bytes.Buffer{}
+		err = Render(&b, equation, true, r.throwOnError)
+		if err != nil {
+			return ast.WalkStop, err
+		}
+		html := b.Bytes()
+		w.WriteString("<div>")
+		w.Write(html)
+		w.WriteString("</div>")
+		r.cacheBlock.Set(string(equation), html)
+		return ast.WalkContinue, nil
+	}
+
+	return ast.WalkStop, err
 }
