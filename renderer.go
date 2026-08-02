@@ -70,9 +70,13 @@ func (r *HTMLRenderer) renderBlock(w util.BufWriter, source []byte, n ast.Node, 
 				return ast.WalkStop, err
 			}
 			html := b.Bytes()
-			w.WriteString("<div>")
+			// No <div> wrapper: Block embeds ast.BaseInline, so goldmark renders
+			// it inside the enclosing <p>, where a <div> is invalid nesting.
+			// KaTeX's displayMode output is already a <span class="katex-display">
+			// block-level element, which is valid there. Wrapping also only
+			// happened on this cache-miss path, so a repeated equation rendered
+			// differently from its first occurrence.
 			w.Write(html)
-			w.WriteString("</div>")
 			r.cacheDisplay.Set(string(node.Equation), html)
 			return ast.WalkContinue, nil
 		}
