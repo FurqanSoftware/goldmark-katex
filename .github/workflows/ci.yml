@@ -17,6 +17,12 @@ jobs:
       - run: test -z "$(gofmt -l .)"
       - run: go vet ./...
 
+  verify-katex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./update-katex.sh --check
+
   test:
     runs-on: ubuntu-latest
     steps:
