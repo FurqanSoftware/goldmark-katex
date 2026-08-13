@@ -6,6 +6,12 @@ import (
 	"github.com/yuin/goldmark/text"
 )
 
+// Parser is the inline parser for math delimited by dollar signs.
+//
+// It handles inline math ("$...$") and display math written in the middle of a
+// line ("text $$x$$ more"). Display math that begins a line is claimed earlier
+// by BlockParser, so it never reaches this parser; what is left here is always
+// confined to a single line.
 type Parser struct {
 }
 
@@ -21,44 +27,24 @@ func (s *Parser) Parse(parent ast.Node, block text.Reader, pc parser.Context) as
 	lend := pos.Stop
 	line := buf[lstart:lend]
 
-	var start, end, advance int
-
 	trigger := line[0]
+
+	var start, end, advance int
 
 	display := len(line) > 1 && line[1] == trigger
 
-	if display { // Display
+	if display {
 		start = lstart + 2
 
-		offset := 2
-
-	L:
-		for x := 0; x < 20; x++ {
-			for j := offset; j < len(line); j++ {
-				if len(line) > j+1 && line[j] == trigger && line[j+1] == trigger {
-					end = lstart + j
-					advance = 2
-					break L
-				}
-			}
-			if lend == len(buf) {
+		for j := 2; j+1 < len(line); j++ {
+			if line[j] == trigger && line[j+1] == trigger {
+				end = lstart + j
+				advance = 2
 				break
-			}
-			if end == 0 {
-				rest := buf[lend:]
-				j := 1
-				for j < len(rest) && rest[j] != '\n' {
-					j++
-				}
-				lstart = lend
-				lend += j
-				line = buf[lstart:lend]
-				ln++
-				offset = 0
 			}
 		}
 
-	} else { // Inline
+	} else {
 		start = lstart + 1
 
 		for i := 1; i < len(line); i++ {
@@ -73,9 +59,10 @@ func (s *Parser) Parse(parent ast.Node, block text.Reader, pc parser.Context) as
 				break
 			}
 		}
-		if end >= len(buf) || buf[end] != trigger {
-			return nil
-		}
+	}
+
+	if end == 0 || end >= len(buf) || buf[end] != trigger {
+		return nil
 	}
 
 	if start >= end {
@@ -89,13 +76,8 @@ func (s *Parser) Parse(parent ast.Node, block text.Reader, pc parser.Context) as
 		block.Advance(newpos)
 	}
 
-	if display {
-		return &Block{
-			Equation: buf[start:end],
-		}
-	} else {
-		return &Inline{
-			Equation: buf[start:end],
-		}
+	return &Inline{
+		Equation: buf[start:end],
+		Display:  display,
 	}
 }

@@ -13,6 +13,11 @@ type Extender struct {
 }
 
 func (e *Extender) Extend(m goldmark.Markdown) {
+	m.Parser().AddOptions(parser.WithBlockParsers(
+		// Ahead of every default block parser, so a multi-line equation is
+		// claimed before Markdown can reinterpret any of its lines.
+		util.Prioritized(&BlockParser{}, 50),
+	))
 	m.Parser().AddOptions(parser.WithInlineParsers(
 		util.Prioritized(&Parser{}, 0),
 	))

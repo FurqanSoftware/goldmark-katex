@@ -30,6 +30,25 @@ A = \pi \times r^2
 $$
 ```
 
+A `$$` that begins a line opens a block, which runs to the next `$$` or to the
+end of the document, much as a fenced code block does. The equation is parsed
+before Markdown, so it is kept verbatim however long it is, and delimiters may
+hug it:
+
+```markdown
+$$\begin{aligned}
+a &= b \\
+c &= d
+\end{aligned}$$
+```
+
+Double `$` in the middle of a line is display math too, rendered in place within
+the surrounding paragraph:
+
+```markdown
+Einstein wrote $$E = mc^2$$ in 1905.
+```
+
 ## Example
 
 <table>
